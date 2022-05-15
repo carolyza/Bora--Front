@@ -3,6 +3,7 @@ import { createTheme, CssBaseline } from "@mui/material";
 import React from "react";
 import { MainApp } from "./components/MainApp";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Create from "./pages/Create";
 
 function App() {
   const theme = createTheme({
@@ -18,6 +19,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainApp />} />
+          <Route path="/adicionar" element={<Create />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

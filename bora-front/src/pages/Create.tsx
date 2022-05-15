@@ -43,7 +43,7 @@ const styles = {
   },
 };
 
-function Tests() {
+function Create() {
   const initialDays: Date[] = [];
   const [days, setDays] = React.useState<Date[] | undefined>(initialDays);
   const [inputValue, setInputValue] = useState<string>("");
@@ -464,4 +464,4 @@ function Tests() {
     </>
   );
 }
-export default Tests;
+export default Create;
