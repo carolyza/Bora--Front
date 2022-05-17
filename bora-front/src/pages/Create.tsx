@@ -3,11 +3,17 @@ import {
   Button,
   Divider,
   TextField,
+  InputAdornment,
+  OutlinedInput,
   InputLabel,
   MenuItem,
+  FormHelperText,
   Select,
   SelectChangeEvent,
+  Checkbox,
+  ListItemText,
 } from "@mui/material";
+
 import { AxiosError } from "axios";
 import React, { useEffect, useState, ChangeEventHandler, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +23,7 @@ import FocusTrap from "focus-trap-react";
 import { DayPicker } from "react-day-picker";
 import api, { Category, City, State, Pg, Tag } from "../services/api";
 import Form from "../components/Form";
+import { borderLeft, borderRadius } from "@mui/system";
 //import useAlert from "../hooks/useAlert";
 
 const styles = {
@@ -34,6 +41,10 @@ const styles = {
     gap: "8px",
     marginTop: "16px",
     marginBottom: "26px",
+  },
+  text: {
+    display: "flex",
+    flexDirection: "row",
   },
   input: { marginBottom: "16px" },
   actionsContainer: {
@@ -71,7 +82,7 @@ function Create() {
   const navigate = useNavigate();
   //const { setMessage } = useAlert();
   const [category, setCategory] = useState("");
-  const [tag, setTag] = useState("");
+  const [tag, setTag] = useState<string[]>([]);
   const [city, setCity] = useState("");
   const [name, setName] = useState("");
   const [image, setimage] = useState("");
@@ -182,9 +193,13 @@ function Create() {
     setFormData({ ...formData, city: event.target.value });
   };
 
-  const handleChangeTag = (event: SelectChangeEvent) => {
-    setTag(event.target.value as string);
+  const handleChangeTag = (event: SelectChangeEvent<typeof tag>) => {
+    const {
+      target: { value },
+    } = event;
+    setTag(typeof value === "string" ? value.split(",") : value);
     setFormData({ ...formData, tag: event.target.value });
+    console.log(tag);
   };
 
   const handleChangePg = (event: SelectChangeEvent) => {
@@ -207,7 +222,7 @@ function Create() {
       adress: adress,
       pg: parseInt(pg),
       duration: duration,
-      tag: parseInt(tag),
+      tag: tag,
       link: link,
     });
 
@@ -290,155 +305,259 @@ function Create() {
       <Form onSubmit={handleSubmit}>
         <Box
           sx={{
-            width: "80vw",
-            maxWidth: "850px",
             display: "flex",
             flexDirection: "column",
-            paddingBottom: "20vh",
-            gap: "8px",
+            justifyContent: "center",
+            marginBottom: "8vh",
           }}
         >
-          <TextField
-            name="name"
-            sx={styles.input}
-            label="Name"
-            type="name"
-            variant="outlined"
-            onChange={handleInputChange}
-            value={formData.name}
-          />
-          <TextField
-            name="sinopse"
-            sx={styles.input}
-            label="sinopse"
-            type="sinopse"
-            variant="outlined"
-            onChange={handleInputChange}
-            value={formData.sinopse}
-          />
-          <TextField
-            name="image"
-            sx={styles.input}
-            label="image"
-            type="link"
-            variant="outlined"
-            onChange={handleInputChange}
-            value={formData.image}
-          />
-          <TextField
-            name="adress"
-            sx={styles.input}
-            label="adress"
-            type="adress"
-            variant="outlined"
-            onChange={handleInputChange}
-            value={formData.adress}
-          />
+          <Box
+            sx={{
+              width: "80vw",
+              maxWidth: "850px",
+              display: "flex",
+              flexDirection: "column",
 
-          <TextField
-            name="price"
-            sx={styles.input}
-            label="price"
-            type="price"
-            variant="outlined"
-            onChange={handleInputChange}
-            value={formData.price}
-          />
-          <TextField
-            name="duration"
-            sx={styles.input}
-            label="duration"
-            type="duration"
-            variant="outlined"
-            onChange={handleInputChange}
-            value={formData.duration}
-          />
-          {/* 
-          <TextField
-            name="hour"
-            sx={styles.input}
-            label="hora"
-            type="hour"
-            variant="outlined"
-            onChange={handleInputChange}
-            value={formData.hour}
-          /> */}
-
-          <TextField
-            name="link"
-            sx={styles.input}
-            label="link"
-            type="link"
-            variant="outlined"
-            onChange={handleInputChange}
-            value={formData.link}
-          />
-
-          <InputLabel id="state">Estado</InputLabel>
-          <Select
-            labelId="state"
-            id="State"
-            value={state}
-            label="State"
-            onChange={handleChangeState}
+              gap: "20px",
+              paddingTop: "30px",
+              paddingLeft: "30px",
+              paddingRight: "30px",
+              paddingBottom: "20px",
+              borderTop: "1px solid black",
+              borderLeft: "1px solid black",
+              borderRight: "1px solid black",
+              justifyContent: "space-between",
+              borderTopLeftRadius: "20px",
+              borderTopRightRadius: "20px",
+            }}
           >
-            {states.map((s) => (
-              <MenuItem value={s.id}>{s.name}</MenuItem>
-            ))}
-          </Select>
+            <TextField
+              name="name"
+              sx={styles.input}
+              label="Título"
+              type="name"
+              variant="outlined"
+              onChange={handleInputChange}
+              value={formData.name}
+            />
 
-          <InputLabel id="city">Cidade</InputLabel>
-          <Select
-            labelId="city"
-            id="City"
-            value={city}
-            label="City"
-            onChange={handleChangeCity}
+            <TextField
+              name="sinopse"
+              sx={styles.input}
+              label="Sinopse"
+              multiline
+              maxRows={5}
+              type="sinopse"
+              variant="outlined"
+              onChange={handleInputChange}
+              value={formData.sinopse}
+            />
+            <TextField
+              name="image"
+              sx={styles.input}
+              label="Imagem"
+              type="link"
+              variant="outlined"
+              onChange={handleInputChange}
+              value={formData.image}
+            />
+          </Box>
+          <Box
+            sx={{
+              width: "80vw",
+              maxWidth: "850px",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: "40px",
+              paddingTop: "8px",
+              paddingLeft: "30px",
+              paddingRight: "30px",
+              paddingBottom: "20px",
+              borderLeft: "1px solid black",
+              borderRight: "1px solid black",
+            }}
           >
-            {cities.map((c: any) => (
-              <MenuItem value={c.city.id}>{c.city.name}</MenuItem>
-            ))}
-          </Select>
+            <div>
+              <TextField
+                name="adress"
+                sx={styles.text}
+                label="Endereço"
+                type="adress"
+                variant="outlined"
+                onChange={handleInputChange}
+                value={formData.adress}
+                fullWidth
+              />
+              <FormHelperText id="outlined-adress-helper-text">
+                Digitar endereço no seguinte formato: Rua tal tal, 118 - Bairro.
+              </FormHelperText>
+            </div>
+            <div>
+              <TextField
+                name="price"
+                sx={styles.text}
+                label="Valor"
+                type="price"
+                variant="outlined"
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">R$</InputAdornment>
+                  ),
+                }}
+                onChange={handleInputChange}
+                value={formData.price}
+              />
+              <FormHelperText id="outlined-price-helper-text">
+                Digitar valor mais barato e valor mais caro. Exemplo: 18,00 -
+                80,00
+              </FormHelperText>
+            </div>
+          </Box>
+          <Box
+            sx={{
+              width: "80vw",
+              maxWidth: "850px",
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "wrap",
+              paddingBottom: "5vh",
+              gap: "20px",
+              paddingTop: "8px",
+              paddingLeft: "30px",
+              paddingRight: "30px",
+              borderBottom: "1px solid black",
+              borderRight: "1px solid black",
+              borderLeft: "1px solid black",
+              justifyContent: "space-between",
+              borderBottomLeftRadius: "20px",
+              borderBottomRightRadius: "20px",
+            }}
+          >
+            <TextField
+              name="duration"
+              sx={styles.input}
+              label="Duração"
+              type="duration"
+              variant="outlined"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">min</InputAdornment>
+                ),
+              }}
+              onChange={handleInputChange}
+              value={formData.duration}
+            />
 
-          <InputLabel id="category">Categoria</InputLabel>
-          <Select
-            labelId="category"
-            id="Category"
-            value={category}
-            label="Category"
-            onChange={handleChangeCategory}
-          >
-            {categories.map((c) => (
-              <MenuItem value={c.id}>{c.name}</MenuItem>
-            ))}
-          </Select>
-          <InputLabel id="pg">Classificação</InputLabel>
-          <Select
-            labelId="pg"
-            id="pg"
-            value={pg}
-            label="Pg"
-            onChange={handleChangePg}
-          >
-            {pgs.map((p) => (
-              <MenuItem value={p.id}>{p.name}</MenuItem>
-            ))}
-          </Select>
+            <div>
+              <TextField
+                name="link"
+                sx={styles.text}
+                label="Link"
+                type="link"
+                variant="outlined"
+                onChange={handleInputChange}
+                value={formData.link}
+                fullWidth
+              />
+              <FormHelperText id="outlined-link-helper-text">
+                Inserir link de preferência. Pode ser de venda online, instagram
+                ou o que for.
+              </FormHelperText>
+            </div>
 
-          <InputLabel id="tags">Tags</InputLabel>
-          <Select
-            labelId="tags"
-            id="Tags"
-            value={tag}
-            label="Tags"
-            onChange={handleChangeTag}
-          >
-            {tags.map((t) => (
-              <MenuItem value={t.id}>{t.name}</MenuItem>
-            ))}
-          </Select>
-
-          {/* <div ref={popperRef}>
+            <div>
+              <InputLabel id="state">Estado</InputLabel>
+              <Select
+                sx={{
+                  width: "100px",
+                }}
+                labelId="state"
+                id="State"
+                value={state}
+                label="State"
+                onChange={handleChangeState}
+              >
+                {states.map((s) => (
+                  <MenuItem value={s.id}>{s.name}</MenuItem>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <InputLabel id="city">Cidade</InputLabel>
+              <Select
+                sx={{
+                  width: "200px",
+                }}
+                labelId="city"
+                id="City"
+                value={city}
+                label="City"
+                onChange={handleChangeCity}
+              >
+                {cities.map((c: any) => (
+                  <MenuItem value={c.city.id}>{c.city.name}</MenuItem>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <InputLabel id="category">Categoria</InputLabel>
+              <Select
+                sx={{
+                  width: "150px",
+                }}
+                labelId="category"
+                id="Category"
+                value={category}
+                label="Category"
+                onChange={handleChangeCategory}
+              >
+                {categories.map((c) => (
+                  <MenuItem value={c.id}>{c.name}</MenuItem>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <InputLabel id="pg">Classificação</InputLabel>
+              <Select
+                sx={{
+                  width: "100px",
+                }}
+                labelId="pg"
+                id="pg"
+                value={pg}
+                label="Pg"
+                onChange={handleChangePg}
+              >
+                {pgs.map((p) => (
+                  <MenuItem value={p.id}>{p.name}</MenuItem>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <InputLabel id="tags">Tags</InputLabel>
+              <Select
+                sx={{
+                  width: "200px",
+                }}
+                labelId="tags"
+                id="Tags"
+                multiple
+                value={tag}
+                label="Tags"
+                input={<OutlinedInput label="Tag" />}
+                renderValue={(selected) => selected.join(", ")}
+                onChange={handleChangeTag}
+              >
+                {tags.map((t) => (
+                  <MenuItem value={t.id}>
+                    <ListItemText primary={t.name} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </div>
+            {/* <div ref={popperRef}>
              <input
               type="text"
               value={inputValue}
@@ -484,9 +603,18 @@ function Create() {
             </FocusTrap>
           )} */}
 
-          <Button variant="contained" type="submit">
-            Enviar
-          </Button>
+            <Button
+              sx={{
+                width: "200px",
+                marginTop: "30px",
+                background: "purple",
+              }}
+              variant="contained"
+              type="submit"
+            >
+              Adicionar Sessões
+            </Button>
+          </Box>
         </Box>
       </Form>
       {/* </Box>  */}

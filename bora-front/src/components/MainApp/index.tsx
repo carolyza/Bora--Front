@@ -25,8 +25,22 @@ export function MainApp({ redirectPath = "/adicionar" }: Props) {
   );
 }
 
-const Top = styled.div``;
+const Top = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid grey;
+  h1 {
+    margin-left: 20px;
+  }
+`;
 
 const Container = styled.div``;
 
-const Options = styled.div``;
+const Options = styled.div`
+  display: flex;
+  gap: 20px;
+  flex-direction: row;
+  margin-right: 20px;
+`;

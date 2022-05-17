@@ -19,8 +19,10 @@ function App() {
       <CssBaseline />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<MainApp />} />
-          <Route path="/adicionar" element={<Create />} />
+          <Route path="/" element={<MainApp />}>
+            <Route path="/adicionar" element={<Create />} />
+          </Route>
+
           <Route path="/datas" element={<Calendar />} />
         </Routes>
       </BrowserRouter>
