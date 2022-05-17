@@ -86,6 +86,8 @@ function Create() {
   const [adress, setAdress] = useState("");
   const [pg, setPg] = useState("");
   const [duration, setDuration] = useState("");
+  const [hour, setHour] = useState("");
+  const [link, setLink] = useState("");
 
   useEffect(() => {
     async function loadPage() {
@@ -99,10 +101,10 @@ function Create() {
       setStates(statesData.states);
 
       const { data: pgsData } = await api.getPgs();
-      setPgs(pgsData.pgs);
+      setPgs(pgsData.classifications);
     }
     loadPage();
-  });
+  }, []);
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -115,8 +117,8 @@ function Create() {
     adress: "",
     pg: "",
     duration: "",
-    tags: "",
-    date: "",
+    tag: "",
+    link: "",
   });
 
   interface FormData {
@@ -124,34 +126,31 @@ function Create() {
     image: string;
     category: any;
     sinopse: string;
-    state: string;
-    city: string;
+    state: any;
+    city: any;
     price: string;
     adress: string;
     pg: any;
     duration: string;
-    tags: any;
-    date: any;
+    tag: any;
+    link: string;
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.name == "name") {
       setName(e.target.value);
-    }
-    if (e.target.name == "image") {
+    } else if (e.target.name == "image") {
       setimage(e.target.value);
-    }
-    if (e.target.name == "sinopse") {
+    } else if (e.target.name == "sinopse") {
       setSinopse(e.target.value);
-    }
-    if (e.target.name == "price") {
+    } else if (e.target.name == "price") {
       setPrices(e.target.value);
-    }
-    if (e.target.name == "adress") {
+    } else if (e.target.name == "adress") {
       setAdress(e.target.value);
-    }
-    if (e.target.name == "duration") {
+    } else if (e.target.name == "duration") {
       setDuration(e.target.value);
+    } else if (e.target.name == "link") {
+      setLink(e.target.value);
     }
 
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -164,6 +163,7 @@ function Create() {
 
   const handleChangeState = (event: SelectChangeEvent) => {
     setState(event.target.value as string);
+
     getCities(parseInt(event.target.value));
     setFormData({ ...formData, state: event.target.value });
   };
@@ -184,7 +184,7 @@ function Create() {
 
   const handleChangeTag = (event: SelectChangeEvent) => {
     setTag(event.target.value as string);
-    setFormData({ ...formData, tags: event.target.value });
+    setFormData({ ...formData, tag: event.target.value });
   };
 
   const handleChangePg = (event: SelectChangeEvent) => {
@@ -196,13 +196,22 @@ function Create() {
     e.preventDefault();
     //setMessage(null);
 
-    // setFormData({
-    //   name: name,
-    //   pdfUrl: pdfUrl,
-    //   category: parseInt(category),
-    //   discipline: parseInt(discipline),
-    //   instructor: parseInt(instructor),
-    // });
+    setFormData({
+      name: name,
+      image: image,
+      category: parseInt(category),
+      sinopse: sinopse,
+      state: parseInt(state),
+      city: parseInt(city),
+      price: price,
+      adress: adress,
+      pg: parseInt(pg),
+      duration: duration,
+      tag: parseInt(tag),
+      link: link,
+    });
+
+    console.log(formData);
 
     if (
       !formData?.name ||
@@ -215,8 +224,8 @@ function Create() {
       !formData?.adress ||
       !formData?.pg ||
       !formData?.duration ||
-      !formData?.tags ||
-      !formData?.date
+      !formData?.tag ||
+      !formData?.link
     ) {
       //setMessage({ type: "error", text: "Todos os campos são obrigatórios!" });
       return;
@@ -225,7 +234,7 @@ function Create() {
     try {
       await api.createArt(formData);
       // setMessage({ type: "success", text: "Cadastro efetuado com sucesso!" });
-      navigate("/app/adicionar");
+      navigate("/adicionar");
     } catch (error: Error | AxiosError | any) {
       if (error.response) {
         //   setMessage({
@@ -311,7 +320,7 @@ function Create() {
             name="image"
             sx={styles.input}
             label="image"
-            type="image"
+            type="link"
             variant="outlined"
             onChange={handleInputChange}
             value={formData.image}
@@ -344,6 +353,26 @@ function Create() {
             onChange={handleInputChange}
             value={formData.duration}
           />
+          {/* 
+          <TextField
+            name="hour"
+            sx={styles.input}
+            label="hora"
+            type="hour"
+            variant="outlined"
+            onChange={handleInputChange}
+            value={formData.hour}
+          /> */}
+
+          <TextField
+            name="link"
+            sx={styles.input}
+            label="link"
+            type="link"
+            variant="outlined"
+            onChange={handleInputChange}
+            value={formData.link}
+          />
 
           <InputLabel id="state">Estado</InputLabel>
           <Select
@@ -367,7 +396,7 @@ function Create() {
             onChange={handleChangeCity}
           >
             {cities.map((c: any) => (
-              <MenuItem value={c.id}>{c.name}</MenuItem>
+              <MenuItem value={c.city.id}>{c.city.name}</MenuItem>
             ))}
           </Select>
 
@@ -396,7 +425,7 @@ function Create() {
             ))}
           </Select>
 
-          <InputLabel id="itags">Tags</InputLabel>
+          <InputLabel id="tags">Tags</InputLabel>
           <Select
             labelId="tags"
             id="Tags"
@@ -409,12 +438,12 @@ function Create() {
             ))}
           </Select>
 
-          <div ref={popperRef}>
-            <input
+          {/* <div ref={popperRef}>
+             <input
               type="text"
               value={inputValue}
               className="input-reset pa2 ma2 bg-white black ba"
-            />
+            /> 
             <button
               ref={buttonRef}
               type="button"
@@ -453,14 +482,14 @@ function Create() {
                 />
               </div>
             </FocusTrap>
-          )}
+          )} */}
 
           <Button variant="contained" type="submit">
             Enviar
           </Button>
         </Box>
       </Form>
-      {/* </Box> */}
+      {/* </Box>  */}
     </>
   );
 }

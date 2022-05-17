@@ -4,6 +4,7 @@ import React from "react";
 import { MainApp } from "./components/MainApp";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Create from "./pages/Create";
+import Calendar from "./pages/Calendar";
 
 function App() {
   const theme = createTheme({
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MainApp />} />
           <Route path="/adicionar" element={<Create />} />
+          <Route path="/datas" element={<Calendar />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

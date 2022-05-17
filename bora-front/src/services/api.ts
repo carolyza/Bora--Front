@@ -38,11 +38,11 @@ async function getCategories() {
 }
 
 async function getCities(state: number) {
-  return baseAPI.get<{ cities: City[] }>(`/cities/${state}`);
+  return baseAPI.get(`/cities/${state}`);
 }
 
 async function getPgs() {
-  return baseAPI.get<{ pgs: Pg[] }>(`/pgs`);
+  return baseAPI.get<{ classifications: Pg[] }>(`/classification`);
 }
 
 async function getStates() {
