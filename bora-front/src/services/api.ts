@@ -30,6 +30,7 @@ export interface Tag {
 }
 
 async function createArt(createData: any) {
+  console.log(createData);
   await baseAPI.post("/adicionar", createData);
 }
 
