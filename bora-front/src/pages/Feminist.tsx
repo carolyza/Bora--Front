@@ -277,7 +277,7 @@ function Feminist() {
         <Tabs aria-label="nav tabs example" value={value}>
           <Tab
             sx={{
-              backgroundColor: "purple",
+              backgroundColor: "red",
               borderTopRightRadius: "25px",
               color: "white",
               borderTopLeftRadius: "5px",
