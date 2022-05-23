@@ -17,5 +17,5 @@
     "downlevelIteration": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "MainApp.tsx"]
+  "include": ["src", "Teather.tsx"]
 }

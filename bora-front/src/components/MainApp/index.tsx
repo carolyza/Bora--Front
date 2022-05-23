@@ -30,7 +30,8 @@ const Top = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid grey;
+  box-shadow: 0px 4px 4px 0px #00000040;
+
   h1 {
     margin-left: 20px;
   }

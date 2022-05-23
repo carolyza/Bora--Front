@@ -17,13 +17,17 @@ import {
 import { AxiosError } from "axios";
 import React, { useEffect, useState, ChangeEventHandler, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { usePopper } from "react-popper";
-import FocusTrap from "focus-trap-react";
 
-import { DayPicker } from "react-day-picker";
-import api, { Category, City, State, Pg, Tag } from "../services/api";
+import api, {
+  Category,
+  City,
+  State,
+  Pg,
+  Tag,
+  SubCategory,
+} from "../services/api";
 import Form from "../components/Form";
-import { borderLeft, borderRadius } from "@mui/system";
+
 //import useAlert from "../hooks/useAlert";
 
 const styles = {
@@ -54,39 +58,17 @@ const styles = {
   },
 };
 
-function Create() {
-  const initialDays: Date[] = [];
-  const [days, setDays] = React.useState<Date[] | undefined>(initialDays);
-  const [inputValue, setInputValue] = useState<string>("");
-  const [isPopperOpen, setIsPopperOpen] = useState(false);
-
-  const popperRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(
-    null
-  );
-
-  const popper = usePopper(popperRef.current, popperElement, {
-    placement: "bottom-start",
-  });
-
-  const closePopper = () => {
-    setIsPopperOpen(false);
-    buttonRef?.current?.focus();
-  };
-
-  const handleButtonClick = () => {
-    setIsPopperOpen(true);
-  };
-
+function Create({ setCatalogueId, catalogueId }: any) {
   const navigate = useNavigate();
   //const { setMessage } = useAlert();
   const [category, setCategory] = useState("");
+  const [subcategory, setsubCategory] = useState("");
   const [tag, setTag] = useState<string[]>([]);
   const [city, setCity] = useState("");
   const [name, setName] = useState("");
   const [image, setimage] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setsubCategories] = useState<SubCategory[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [pgs, setPgs] = useState<Pg[]>([]);
@@ -97,14 +79,18 @@ function Create() {
   const [adress, setAdress] = useState("");
   const [pg, setPg] = useState("");
   const [duration, setDuration] = useState("");
-  const [hour, setHour] = useState("");
   const [link, setLink] = useState("");
+  const [postId, setPostId] = useState(null);
+  const [tagId, setTagId] = useState("");
 
   useEffect(() => {
     async function loadPage() {
       const { data: categoriesData } = await api.getCategories();
       setCategories(categoriesData.categories);
 
+      const { data: subcategoriesData } = await api.getSubCategories();
+      setsubCategories(subcategoriesData.subcategories);
+      console.log(subcategories);
       const { data: tagsData } = await api.getTags();
       setTags(tagsData.tags);
 
@@ -121,6 +107,7 @@ function Create() {
     name: "",
     image: "",
     category: "",
+    subcategory: "",
     sinopse: "",
     state: "",
     city: "",
@@ -128,7 +115,7 @@ function Create() {
     adress: "",
     pg: "",
     duration: "",
-    tag: "",
+    tagsartId: "",
     link: "",
   });
 
@@ -136,6 +123,7 @@ function Create() {
     name: string;
     image: string;
     category: any;
+    subcategory: any;
     sinopse: string;
     state: any;
     city: any;
@@ -143,7 +131,7 @@ function Create() {
     adress: string;
     pg: any;
     duration: string;
-    tag: any;
+    tagsartId: any;
     link: string;
   }
 
@@ -172,6 +160,11 @@ function Create() {
     setFormData({ ...formData, category: event.target.value });
   };
 
+  const handleChangeSubCategory = (event: SelectChangeEvent) => {
+    setsubCategory(event.target.value as string);
+    setFormData({ ...formData, subcategory: event.target.value });
+  };
+
   const handleChangeState = (event: SelectChangeEvent) => {
     setState(event.target.value as string);
 
@@ -188,6 +181,17 @@ function Create() {
     }
   }
 
+  async function patchTag(postId: any, tags: any) {
+    if (postId == null) {
+      const { data: id } = await api.postTag(tags);
+      console.log(id.id);
+      setPostId(id.id);
+      setTagId(id.id);
+    } else {
+      await api.patchTag(postId, tags);
+    }
+  }
+
   const handleChangeCity = (event: SelectChangeEvent) => {
     setCity(event.target.value as string);
     setFormData({ ...formData, city: event.target.value });
@@ -198,7 +202,8 @@ function Create() {
       target: { value },
     } = event;
     setTag(typeof value === "string" ? value.split(",") : value);
-    setFormData({ ...formData, tag: event.target.value });
+
+    patchTag(postId, tags);
     console.log(tag);
   };
 
@@ -215,6 +220,7 @@ function Create() {
       name: name,
       image: image,
       category: parseInt(category),
+      subcategory: parseInt(subcategory),
       sinopse: sinopse,
       state: parseInt(state),
       city: parseInt(city),
@@ -222,7 +228,7 @@ function Create() {
       adress: adress,
       pg: parseInt(pg),
       duration: duration,
-      tag: tag,
+      tagsartId: parseInt(tagId),
       link: link,
     });
 
@@ -239,7 +245,7 @@ function Create() {
       !formData?.adress ||
       !formData?.pg ||
       !formData?.duration ||
-      !formData?.tag ||
+      !formData?.tagsartId ||
       !formData?.link
     ) {
       //setMessage({ type: "error", text: "Todos os campos são obrigatórios!" });
@@ -247,9 +253,9 @@ function Create() {
     }
 
     try {
-      await api.createArt(formData);
       // setMessage({ type: "success", text: "Cadastro efetuado com sucesso!" });
-      navigate("/adicionar");
+      const { data: id } = await api.createArt(formData);
+      setCatalogueId(id.id);
     } catch (error: Error | AxiosError | any) {
       if (error.response) {
         //   setMessage({
@@ -263,45 +269,11 @@ function Create() {
       //   text: "Erro, tente novamente em alguns segundos!",
       // });
     }
+    navigate("/sessoes");
   }
 
   return (
     <>
-      {/* <TextField
-          sx={{ marginX: "auto", marginBottom: "25px", width: "450px" }}
-          label="Pesquise por disciplina"
-        />
-        <Divider sx={{ marginBottom: "35px" }} />
-        <Box
-          sx={{
-            marginX: "auto",
-            width: "700px",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            <Button
-              variant="outlined"
-              onClick={() => navigate("/app/disciplinas")}
-            >
-              Disciplinas
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => navigate("/app/pessoas-instrutoras")}
-            >
-              Pessoa Instrutora
-            </Button>
-            <Button variant="contained" onClick={() => navigate("/app/adicionar-prova")}>
-              Adicionar
-            </Button>
-          </Box> */}
       <Form onSubmit={handleSubmit}>
         <Box
           sx={{
@@ -519,6 +491,23 @@ function Create() {
               </Select>
             </div>
             <div>
+              <InputLabel id="subcategory">SubCategoria</InputLabel>
+              <Select
+                sx={{
+                  width: "150px",
+                }}
+                labelId="subcategory"
+                id="subCategory"
+                value={subcategory}
+                label="Category"
+                onChange={handleChangeSubCategory}
+              >
+                {subcategories.map((c) => (
+                  <MenuItem value={c.id}>{c.name}</MenuItem>
+                ))}
+              </Select>
+            </div>
+            <div>
               <InputLabel id="pg">Classificação</InputLabel>
               <Select
                 sx={{
@@ -557,51 +546,6 @@ function Create() {
                 ))}
               </Select>
             </div>
-            {/* <div ref={popperRef}>
-             <input
-              type="text"
-              value={inputValue}
-              className="input-reset pa2 ma2 bg-white black ba"
-            /> 
-            <button
-              ref={buttonRef}
-              type="button"
-              className="pa2 bg-white button-reset ba"
-              aria-label="Pick a date"
-              onClick={handleButtonClick}
-            >
-              <span role="img" aria-label="calendar icon">
-                📅
-              </span>
-            </button>
-          </div>
-          {isPopperOpen && (
-            <FocusTrap
-              active
-              focusTrapOptions={{
-                initialFocus: false,
-                allowOutsideClick: true,
-                clickOutsideDeactivates: true,
-                onDeactivate: closePopper,
-              }}
-            >
-              <div
-                tabIndex={-1}
-                style={popper.styles.popper}
-                className="dialog-sheet"
-                {...popper.attributes.popper}
-                ref={setPopperElement}
-                role="dialog"
-              >
-                <DayPicker
-                  mode="multiple"
-                  min={1}
-                  selected={days}
-                  onSelect={setDays}
-                />
-              </div>
-            </FocusTrap>
-          )} */}
 
             <Button
               sx={{
