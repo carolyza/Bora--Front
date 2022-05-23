@@ -25,11 +25,13 @@ function Teather() {
   const [states, setStates] = useState<State[]>([]);
   const [state, setState] = useState("");
   const [date, setDate] = useState<any>();
+  const [mapArray, setMapArray] = useState<any[]>([]);
   const [formData, setFormData] = useState<FormData>({
     state: "",
     city: "",
     date: "",
   });
+  const empty = null;
 
   interface FormData {
     state: any;
@@ -45,7 +47,6 @@ function Teather() {
     loadPage();
   }, []);
 
-  console.log(value);
   const handleChangeState = (event: SelectChangeEvent) => {
     setState(event.target.value as string);
 
@@ -69,7 +70,65 @@ function Teather() {
 
   async function search() {
     Formatation();
-    await api.getTeather(formData);
+
+    let session: any = await api.getSession(formData.date);
+    console.log(session);
+    let sessions = [];
+    let searchResult = [];
+
+    for (let i = 0; i < session.data.sessionId.length; i++) {
+      let sessionId = session.data.sessionId[i].id;
+
+      const result = await api.getSessions(sessionId);
+      console.log(result);
+      if (result.data.catalogueId != null) {
+        sessions.push(result.data.catalogueId.catalogueId);
+      }
+      console.log(sessions);
+    }
+
+    let newSessions: any = [];
+    for (let x = 0; x < sessions.length; x++) {
+      let sum = 0;
+      if (newSessions.includes(sessions[x])) {
+        sum = 1;
+      }
+      if (sum === 0) {
+        newSessions.push(sessions[x]);
+      }
+    }
+    console.log(newSessions);
+    for (let y = 0; y < newSessions.length; y++) {
+      const createData = {
+        state,
+        city,
+        sessions: newSessions[y],
+      };
+      const result = await api.getTeather(createData);
+
+      searchResult.push(result.data.catalogue);
+      console.log(searchResult);
+    }
+
+    for (let w = 0; w < searchResult.length; w++) {
+      const tagsArray = await api.getTagsArt(searchResult[w].tagsartId);
+
+      const pg = await api.getMyPg(searchResult[w].classificationId);
+
+      let createForm = {
+        adress: searchResult[w].adress,
+        duration: searchResult[w].duration,
+        image: searchResult[w].image,
+        link: searchResult[w].link,
+        name: searchResult[w].name,
+        price: searchResult[w].price,
+        sinopse: searchResult[w].sinopse,
+        tags: tagsArray.data.tags,
+        pg: pg.data.pgs.name,
+      };
+      setMapArray([...mapArray, createForm]);
+    }
+    console.log(mapArray);
   }
 
   function Formatation() {
@@ -330,7 +389,7 @@ function Teather() {
           <Select
             sx={{
               width: "100px",
-              color: "white",
+              color: "black",
               backgroundColor: "white",
             }}
             labelId="state"
@@ -352,7 +411,7 @@ function Teather() {
             sx={{
               width: "200px",
               backgroundColor: "white",
-              color: "white",
+              color: "black",
             }}
             labelId="city"
             id="City"
@@ -375,7 +434,7 @@ function Teather() {
               <TextField
                 sx={{
                   backgroundColor: "white",
-                  color: "white",
+                  color: "black",
                 }}
                 {...params}
               />
@@ -391,6 +450,53 @@ function Teather() {
         >
           Pesquisar
         </Button>
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {mapArray.map((m) => (
+          <Box
+            sx={{
+              marginTop: "10px",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              border: "1px solid red",
+              borderRadius: "20px",
+              width: "50%",
+            }}
+          >
+            <div>
+              <img src={m.image} />
+            </div>
+            <div>
+              <Box>
+                <h3>Titulo:{m.name}</h3>
+                <h4>Sinopse:{m.sinopse}</h4>
+                <h4>Endereço:{m.adress}</h4>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "20px",
+                }}
+              >
+                <h4>Duração:{m.duration}</h4>
+                <h4>Preço:{m.price}</h4>
+                <h4>Classificação:{m.pg}</h4>
+              </Box>
+              <h4>Link:{m.link}</h4>
+            </div>
+          </Box>
+        ))}
       </Box>
     </>
   );

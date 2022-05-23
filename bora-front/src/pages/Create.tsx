@@ -229,7 +229,7 @@ function Create({ setCatalogueId, catalogueId }: any) {
       pg: parseInt(pg),
       duration: duration,
       tagsartId: parseInt(tagId),
-      link: link,
+      link: link.toString(),
     });
 
     console.log(formData);

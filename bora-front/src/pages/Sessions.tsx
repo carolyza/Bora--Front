@@ -83,10 +83,12 @@ export default function Sessions({ catalogueId }: any) {
       try {
         const { data: id } = await api.createSession(sessionsFuso[i]);
         setSessionsId(id.id);
+        console.log(id.id);
         const createData = {
           catalogueId,
-          sessionsId,
+          sessionsId: id.id,
         };
+        console.log(createData);
         await api.createSessions(createData);
       } catch (error) {
         console.log(error);

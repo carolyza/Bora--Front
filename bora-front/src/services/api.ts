@@ -75,6 +75,14 @@ async function getPgs() {
   return baseAPI.get<{ classifications: Pg[] }>(`/classification`);
 }
 
+async function getTagsArt(formData: any) {
+  return baseAPI.get<any>("/tagsart", formData);
+}
+
+async function getMyPg(formData: any) {
+  return baseAPI.get<any>("/pg/selected", formData);
+}
+
 async function getStates() {
   return baseAPI.get<{ states: State[] }>(`/states`);
 }
@@ -115,10 +123,21 @@ async function getBlackArt(formData: any) {
   return baseAPI.get<any>(`/artepreta`, formData);
 }
 
+async function getSession(formData: any) {
+  return baseAPI.get<any>(`/sessao`, formData);
+}
+
+async function getSessions(sessionId: any) {
+  console.log(sessionId);
+  return baseAPI.get(`/sessoes/${sessionId}`);
+}
+
 const api = {
   createArt,
   getCategories,
   getCities,
+  getSession,
+  getSessions,
   getPgs,
   getStates,
   getTags,
@@ -135,6 +154,8 @@ const api = {
   getBlackArt,
   getTeather,
   getFeminist,
+  getTagsArt,
+  getMyPg,
 };
 
 export default api;
