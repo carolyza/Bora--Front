@@ -26,12 +26,13 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { AxiosError } from "axios";
 import React, { useEffect, useState, ChangeEventHandler, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import ptBR from "dayjs/locale/pt-br";
 import api, { DateTime } from "../services/api";
 
 export default function Sessions({ catalogueId }: any) {
+  const navigate = useNavigate();
   const [value, setValue] = React.useState<Date | null>(
     new Date("2022-01-01T00:00:00.000Z")
   );
@@ -90,6 +91,7 @@ export default function Sessions({ catalogueId }: any) {
         };
         console.log(createData);
         await api.createSessions(createData);
+        navigate("/teatro");
       } catch (error) {
         console.log(error);
       }
