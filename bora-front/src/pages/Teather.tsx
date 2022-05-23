@@ -16,6 +16,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ptBR from "dayjs/locale/pt-br";
+import styled from "styled-components";
 
 function Teather() {
   const navigate = useNavigate();
@@ -98,6 +99,7 @@ function Teather() {
       }
     }
     console.log(newSessions);
+
     for (let y = 0; y < newSessions.length; y++) {
       const createData = {
         state,
@@ -473,9 +475,9 @@ function Teather() {
               width: "50%",
             }}
           >
-            <div>
-              <img src={m.image} />
-            </div>
+            <Box>
+              <Img width="300px" src={m.image} />
+            </Box>
             <div>
               <Box>
                 <h3>Titulo:{m.name}</h3>
@@ -501,5 +503,10 @@ function Teather() {
     </>
   );
 }
+
+const Img = styled.img`
+  width: "30px";
+  height: "30px";
+`;
 
 export default Teather;

@@ -16,6 +16,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ptBR from "dayjs/locale/pt-br";
+import styled from "styled-components";
 
 function Feminist() {
   const navigate = useNavigate();
@@ -25,11 +26,13 @@ function Feminist() {
   const [states, setStates] = useState<State[]>([]);
   const [state, setState] = useState("");
   const [date, setDate] = useState<any>();
+  const [mapArray, setMapArray] = useState<any[]>([]);
   const [formData, setFormData] = useState<FormData>({
     state: "",
     city: "",
     date: "",
   });
+  const empty = null;
 
   interface FormData {
     state: any;
@@ -45,7 +48,6 @@ function Feminist() {
     loadPage();
   }, []);
 
-  console.log(value);
   const handleChangeState = (event: SelectChangeEvent) => {
     setState(event.target.value as string);
 
@@ -69,7 +71,66 @@ function Feminist() {
 
   async function search() {
     Formatation();
-    await api.getFeminist(formData);
+
+    let session: any = await api.getSession(formData.date);
+    console.log(session);
+    let sessions = [];
+    let searchResult = [];
+
+    for (let i = 0; i < session.data.sessionId.length; i++) {
+      let sessionId = session.data.sessionId[i].id;
+
+      const result = await api.getSessions(sessionId);
+      console.log(result);
+      if (result.data.catalogueId != null) {
+        sessions.push(result.data.catalogueId.catalogueId);
+      }
+      console.log(sessions);
+    }
+
+    let newSessions: any = [];
+    for (let x = 0; x < sessions.length; x++) {
+      let sum = 0;
+      if (newSessions.includes(sessions[x])) {
+        sum = 1;
+      }
+      if (sum === 0) {
+        newSessions.push(sessions[x]);
+      }
+    }
+    console.log(newSessions);
+
+    for (let y = 0; y < newSessions.length; y++) {
+      const createData = {
+        state,
+        city,
+        sessions: newSessions[y],
+      };
+      const result = await api.getFeminist(createData);
+
+      searchResult.push(result.data.catalogue);
+      console.log(searchResult);
+    }
+
+    for (let w = 0; w < searchResult.length; w++) {
+      const tagsArray = await api.getTagsArt(searchResult[w].tagsartId);
+
+      const pg = await api.getMyPg(searchResult[w].classificationId);
+
+      let createForm = {
+        adress: searchResult[w].adress,
+        duration: searchResult[w].duration,
+        image: searchResult[w].image,
+        link: searchResult[w].link,
+        name: searchResult[w].name,
+        price: searchResult[w].price,
+        sinopse: searchResult[w].sinopse,
+        tags: tagsArray.data.tags,
+        pg: pg.data.pgs.name,
+      };
+      setMapArray([...mapArray, createForm]);
+    }
+    console.log(mapArray);
   }
 
   function Formatation() {
@@ -216,7 +277,7 @@ function Feminist() {
         <Tabs aria-label="nav tabs example" value={value}>
           <Tab
             sx={{
-              backgroundColor: "red",
+              backgroundColor: "purple",
               borderTopRightRadius: "25px",
               color: "white",
               borderTopLeftRadius: "5px",
@@ -330,7 +391,7 @@ function Feminist() {
           <Select
             sx={{
               width: "100px",
-              color: "white",
+              color: "black",
               backgroundColor: "white",
             }}
             labelId="state"
@@ -352,7 +413,7 @@ function Feminist() {
             sx={{
               width: "200px",
               backgroundColor: "white",
-              color: "white",
+              color: "black",
             }}
             labelId="city"
             id="City"
@@ -375,7 +436,7 @@ function Feminist() {
               <TextField
                 sx={{
                   backgroundColor: "white",
-                  color: "white",
+                  color: "black",
                 }}
                 {...params}
               />
@@ -392,8 +453,60 @@ function Feminist() {
           Pesquisar
         </Button>
       </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {mapArray.map((m) => (
+          <Box
+            sx={{
+              marginTop: "10px",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              border: "1px solid red",
+              borderRadius: "20px",
+              width: "50%",
+            }}
+          >
+            <Box>
+              <Img width="300px" src={m.image} />
+            </Box>
+            <div>
+              <Box>
+                <h3>Titulo:{m.name}</h3>
+                <h4>Sinopse:{m.sinopse}</h4>
+                <h4>Endereço:{m.adress}</h4>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "20px",
+                }}
+              >
+                <h4>Duração:{m.duration}</h4>
+                <h4>Preço:{m.price}</h4>
+                <h4>Classificação:{m.pg}</h4>
+              </Box>
+              <h4>Link:{m.link}</h4>
+            </div>
+          </Box>
+        ))}
+      </Box>
     </>
   );
 }
+
+const Img = styled.img`
+  width: "30px";
+  height: "30px";
+`;
 
 export default Feminist;

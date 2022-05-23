@@ -92,31 +92,32 @@ async function getTags() {
 }
 
 async function getTeather(formData: any) {
-  return baseAPI.get<any>(`/teatro`, formData);
+  console.log(formData, "formdata");
+  return baseAPI.post<any>(`/teatro`, formData);
 }
 
 async function getShow(formData: any) {
-  return baseAPI.get<any>(`/show`, formData);
+  return baseAPI.post<any>(`/show`, formData);
 }
 
 async function getLgbt(formData: any) {
-  return baseAPI.get<any>(`/lgbtqia`, formData);
+  return baseAPI.post<any>(`/lgbtqia`, formData);
 }
 
 async function getFeminist(formData: any) {
-  return baseAPI.get<any>(`/feminista`, formData);
+  return baseAPI.post<any>(`/feminista`, formData);
 }
 
 async function getExpo(formData: any) {
-  return baseAPI.get<any>(`/exposicao`, formData);
+  return baseAPI.post<any>(`/exposicao`, formData);
 }
 
 async function getEvent(formData: any) {
-  return baseAPI.get<any>(`/eventos`, formData);
+  return baseAPI.post<any>(`/eventos`, formData);
 }
 
 async function getDance(formData: any) {
-  return baseAPI.get<any>(`/danca`, formData);
+  return baseAPI.post<any>(`/danca`, formData);
 }
 
 async function getBlackArt(formData: any) {
@@ -129,7 +130,7 @@ async function getSession(formData: any) {
 
 async function getSessions(sessionId: any) {
   console.log(sessionId);
-  return baseAPI.get(`/sessoes/${sessionId}`);
+  return baseAPI.get(`/sessoes/sessao/${sessionId}`);
 }
 
 const api = {
